@@ -46,6 +46,13 @@ function sendAppUpdateEvent(payload) {
 
 if (_autoUpdater) {
   try {
+    // Allow tests to override the update feed URL via env var (useful for local / CI testing)
+    try {
+      if (process.env.UPDATE_FEED_URL && typeof _autoUpdater.setFeedURL === 'function') {
+        try { _autoUpdater.setFeedURL({ provider: 'generic', url: process.env.UPDATE_FEED_URL }) } catch (e) {}
+      }
+    } catch (e) {}
+
     _autoUpdater.autoDownload = false
     try {
       const log = require('electron-log')
@@ -76,6 +83,26 @@ if (_autoUpdater) {
     })
   } catch (e) {}
 }
+
+  // Ensure IPC handlers exist even if `electron-updater` isn't installed at runtime.
+  // This prevents the renderer from failing with "No handler registered" and
+  // provides a clear message indicating the auto-updater is unavailable.
+  try {
+    ipcMain.handle('check-for-updates', async () => {
+      if (!_autoUpdater) return { ok: false, msg: 'auto-updater not available in this build' }
+      try { await _autoUpdater.checkForUpdates(); return { ok: true } } catch (e) { return { ok: false, msg: String(e) } }
+    })
+
+    ipcMain.handle('download-update', async () => {
+      if (!_autoUpdater) return { ok: false, msg: 'auto-updater not available in this build' }
+      try { await _autoUpdater.downloadUpdate(); return { ok: true } } catch (e) { return { ok: false, msg: String(e) } }
+    })
+
+    ipcMain.handle('install-update', async () => {
+      if (!_autoUpdater) return { ok: false, msg: 'auto-updater not available in this build' }
+      try { _autoUpdater.quitAndInstall(); return { ok: true } } catch (e) { return { ok: false, msg: String(e) } }
+    })
+  } catch (e) {}
 
 // Encryption helpers for last-user storage
 const KEY_FILE = 'last-user.key'
