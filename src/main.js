@@ -54,7 +54,10 @@ if (_autoUpdater) {
     } catch (e) {}
 
     _autoUpdater.on('checking-for-update', () => sendAppUpdateEvent({ event: 'checking' }))
-    _autoUpdater.on('update-available', info => sendAppUpdateEvent({ event: 'update-available', info }))
+    _autoUpdater.on('update-available', info => {
+      sendAppUpdateEvent({ event: 'update-available', info })
+      try { _autoUpdater.downloadUpdate() } catch (e) {}
+    })
     _autoUpdater.on('update-not-available', info => sendAppUpdateEvent({ event: 'update-not-available', info }))
     _autoUpdater.on('download-progress', progress => sendAppUpdateEvent({ event: 'download-progress', progress }))
     _autoUpdater.on('update-downloaded', info => sendAppUpdateEvent({ event: 'update-downloaded', info }))
@@ -170,6 +173,15 @@ function createWindow () {
 
 app.whenReady().then(async () => {
   createWindow()
+
+  // If auto-updater is available, check for updates on startup and every 6 hours
+  try {
+    if (_autoUpdater) {
+      try { _autoUpdater.checkForUpdates().catch(()=>{}) } catch (e) {}
+      const SIX_HOURS = 1000 * 60 * 60 * 6
+      try { setInterval(() => { try { _autoUpdater.checkForUpdates().catch(()=>{}) } catch (e) {} }, SIX_HOURS) } catch (e) {}
+    }
+  } catch (e) {}
 
   // Auto-login flow: if a last-user marker exists, create a custom token
   // and open the dashboard automatically.

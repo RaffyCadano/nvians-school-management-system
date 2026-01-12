@@ -1,0 +1,39 @@
+﻿#!/usr/bin/env node
+const { execSync } = require('child_process')
+const fs = require('fs')
+
+function fail(msg) { console.error('\nERROR: ' + msg + '\n'); process.exit(1) }
+
+try {
+  const staged = execSync('git diff --cached --name-only', { encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean)
+  if (staged.length === 0) process.exit(0)
+  const checks = [
+    new RegExp('-----BEGIN ' + 'PRIVATE KEY-----', 'i'),
+    /private_key/i,
+    /serviceAccount\.json/i,
+    /GH_TOKEN/i,
+    /FIREBASE_SERVICE_ACCOUNT/i,
+    /CSC_KEY_PASSWORD/i,
+    /\.pfx$/i,
+    /\.p12$/i,
+    /\.pem$/i
+  ]
+  for (const f of staged) {
+    // skip the hook itself and other githooks to avoid self-matching
+    if (f.startsWith('.githooks')) continue
+    try {
+      const content = fs.readFileSync(f, 'utf8')
+      for (const r of checks) {
+        if (r.test(content)) {
+          fail(`Staged file ${f} appears to contain a secret matching ${r}. Remove it from the commit.`)
+        }
+      }
+    } catch (e) {
+      // ignore binary files or unreadable
+    }
+  }
+  process.exit(0)
+} catch (e) {
+  // If git isn't available or other error, don't block commit
+  process.exit(0)
+}

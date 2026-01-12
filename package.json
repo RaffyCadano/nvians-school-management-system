@@ -29,8 +29,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "firebase-admin": "^13.6.0"
-    ,"electron-updater": "^5.4.1"
+    "firebase-admin": "^13.6.0",
+    "electron-updater": "^5.4.2"
   }
   ,
   "build": {
@@ -65,8 +65,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "YOUR_GITHUB_OWNER",
-        "repo": "YOUR_REPO_NAME"
+        "owner": "RaffyCadano",
+        "repo": "nvians-school-management-system"
       }
     ]
   }
