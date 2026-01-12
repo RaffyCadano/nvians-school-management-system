@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					<i class="bi bi-mortarboard text-white" style="font-size:14px; line-height:1;"></i>
 				</div>
 				<div class="d-none d-sm-flex flex-column justify-content-center">
-					<div class="h6 mb-0" style="font-size:1rem; line-height:1;">Nvians School Management System</div>
+					<div class="h6 mb-0" style="font-size:1rem; line-height:1;">Nvians - School Management System</div>
 				</div>
 			</div>`
 
