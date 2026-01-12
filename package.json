@@ -1,6 +1,6 @@
 {
   "name": "admin-software-electron",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Electron scaffold for admin-software",
   "main": "src/main.js",
   "authors": [
