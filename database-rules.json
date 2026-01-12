@@ -1,0 +1,74 @@
+
+{
+	"rules": {
+		"admins": {
+			".read": "auth != null && auth.token.admin === true",
+			".write": "auth != null && auth.token.admin === true"
+		},
+		"admin-audit": {
+			".read": "auth != null && auth.token.admin === true",
+			".indexOn": ["ts"],
+			"$auditId": {
+				".write": "auth != null && auth.token.admin === true && !data.exists()",
+				".validate": "newData.hasChildren(['action','ts'])"
+			}
+		},
+		"teachers": {
+			".read": "auth != null",
+			".write": "auth != null && auth.token.admin === true"
+		},
+		"students": {
+			".read": "auth != null",
+			".write": "auth != null && auth.token.admin === true"
+		},
+		"school_years": {
+			".read": "auth != null",
+			".write": "auth != null && auth.token.admin === true"
+		},
+		"terms": {
+			".read": "auth != null",
+			".write": "auth != null && auth.token.admin === true"
+		},
+		"classes": {
+			".read": "auth != null",
+			".write": "auth != null && auth.token.admin === true"
+		},
+		"subjects": {
+			".read": "auth != null",
+			".write": "auth != null && auth.token.admin === true",
+			".indexOn": ["code"]
+		},
+		"class_subjects": {
+			".read": "auth != null",
+			".write": "auth != null && (auth.token.admin === true || auth.token.teacher === true)",
+			".indexOn": ["composite"]
+		},
+		"assignments": {
+			".read": "auth != null",
+			".write": "auth != null && (auth.token.admin === true || auth.token.teacher === true)",
+			".indexOn": ["composite","class_id","teacher_id","school_year"],
+			"$assignmentId": {
+				".validate": "newData.hasChildren(['title','class_subject_id','due_date','school_year'])"
+			}
+		},
+		"assignment_submissions": {
+			".read": "auth != null",
+			".write": "auth != null && (auth.token.admin === true || auth.uid === newData.child('student_id').val())",
+			".indexOn": ["assignment_id","student_id","status"]
+		},
+		"attendance_sessions": {
+			".read": "auth != null",
+			".write": "auth != null && (auth.token.admin === true || auth.token.teacher === true)"
+		},
+		"attendance_records": {
+			".read": "auth != null",
+			".write": "auth != null && (auth.token.admin === true || auth.uid === newData.child('student_id').val() || auth.token.teacher === true)"
+		},
+		"final_grades": {
+			".read": "auth != null",
+			".write": "auth != null && auth.token.admin === true"
+		},
+		".read": "auth != null",
+		".write": "auth != null && auth.token.admin === true"
+	}
+}

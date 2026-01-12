@@ -1,0 +1,485 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/dashboard-style.css">
+</head>
+
+<body>
+    <div class="app-bar">
+        <button id="dashMinimize" class="btn" title="Minimize"><i class="bi bi-dash-lg"></i></button>
+        <button id="dashClose" class="btn text-danger" title="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="app-body">
+        <div class="dashboard-layout d-flex">
+            <aside id="sidebar" class="bg-surface border-end">
+                <nav class="side-nav p-2">
+                    <ul class="nav flex-column">
+                        <div class="py-2">Navigation</div>
+                        <li class="nav-item mb-1"><a class="nav-link view-link active" href="#" data-view="overview"><i class="bi bi-house me-2"></i>Overview</a></li>
+                        <li class="nav-section mt-3 mb-1"><small class="text-muted px-2">Accounts</small></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="admin"><i class="bi bi-person-badge me-2"></i>Admins</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="teacher"><i class="bi bi-person-lines-fill me-2"></i>Teachers</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="student"><i class="bi bi-person me-2"></i>Students</a></li>
+
+                        <li class="nav-section mt-3 mb-1"><small class="text-muted px-2">Academic</small></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="classes"><i class="bi bi-journals me-2"></i>Classes</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="subjects"><i class="bi bi-bookmarks me-2"></i>Subjects</a></li>
+
+                        <li class="nav-section mt-3 mb-1"><small class="text-muted px-2">Student Management</small></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="enroll-classes"><i class="bi bi-card-checklist me-2"></i>Enroll Classes</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="enroll-subjects"><i class="bi bi-bookmarks me-2"></i>Enroll Subjects</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="records"><i class="bi bi-folder2-open me-2"></i>Records</a></li>
+
+                        <li class="nav-section mt-3 mb-1"><small class="text-muted px-2">System Data</small></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="grades"><i class="bi bi-clipboard-data me-2"></i>Grades</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="attendance"><i class="bi bi-calendar-check me-2"></i>Attendance</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="assignments"><i class="bi bi-file-earmark-text me-2"></i>Assignments</a></li>
+
+                        <li class="nav-section mt-3 mb-1"><small class="text-muted px-2">Settings</small></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="year-term"><i class="bi bi-calendar3 me-2"></i>School Year / Term</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="roles"><i class="bi bi-shield-lock me-2"></i>Roles</a></li>
+                        <li class="nav-item"><a class="nav-link view-link" href="#" data-view="audit"><i class="bi bi-flag me-2"></i>Audit Logs</a></li>
+                        <li class="nav-item"><a id="signOutBtn" class="nav-link text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <main id="mainContent" class="flex-fill p-4">
+                <!-- Dynamic view content will be injected here by `loadView(name)` -->
+            </main>
+        </div>
+    </div>
+
+    <script src="./js/custom-appbar.js"></script>
+
+    <!-- Initialize Firebase in dashboard window (load config + compat SDKs) -->
+    <script>
+        (async function() {
+            const loadScript = (src) => new Promise((resolve, reject) => {
+                if (document.querySelector('script[src="' + src + '"]')) return resolve();
+                const s = document.createElement('script'); s.src = src; s.async = false;
+                s.onload = () => resolve(src); s.onerror = () => reject(new Error('Failed to load ' + src));
+                document.head.appendChild(s);
+            });
+            try {
+                // firebase-config is in renderer/firebase-config/firebase-config.js (one level up)
+                await loadScript('../firebase-config/firebase-config.js');
+                // Try a couple of CDN candidates if a specific version isn't available
+                // Try known stable CDN versions (avoid versions that may 404)
+                const appCandidates = [
+                    'https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js',
+                    'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js'
+                ];
+                const authCandidates = [
+                    'https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js',
+                    'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js'
+                ];
+                const dbCandidates = [
+                    'https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js',
+                    'https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js',
+                    'https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js'
+                ];
+                const tryScripts = async (list) => {
+                    for (const src of list) {
+                        try { await loadScript(src); return src } catch (e) { /* try next */ }
+                    }
+                    throw new Error('All CDN candidates failed')
+                }
+                await tryScripts(appCandidates);
+                await tryScripts(authCandidates);
+                // Ensure Realtime Database compat SDK is also available for client fallback reads/writes
+                await tryScripts(dbCandidates);
+                if (window.firebase && (!window.firebase.apps || window.firebase.apps.length === 0)) {
+                    if (window.firebaseConfig) window.firebase.initializeApp(window.firebaseConfig);
+                }
+            } catch (e) {
+                console.warn('Dashboard firebase init failed', e);
+            }
+        })();
+    </script>
+    <script>
+        // Hook the "Open School Year / Term Setup" button in the modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('openYearTermSetupBtn');
+            if (!btn) return;
+            btn.addEventListener('click', (e) => {
+                try {
+                    const modalEl = document.getElementById('ensureAcademicContextModal');
+                    if (modalEl && typeof bootstrap !== 'undefined') {
+                        const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                        inst.hide();
+                    }
+                } catch (err) { /* ignore */ }
+                try { if (typeof loadView === 'function') loadView('year-term'); } catch (e) { console.warn('Could not open year-term view', e); }
+            });
+        });
+    </script>
+
+    <!-- Create Admin Modal removed (now injected by admin-management view) -->
+    <!-- Confirm Create Admin Modal -->
+    <script>
+        // Ensure an active academic context exists before performing academic actions
+        window.ensureAcademicContext = function() {
+            try {
+                const sy = window._activeSchoolYearId || window._activeSchoolYearLabel || null;
+                const term = window._activeTermId || window._activeTermLabel || null;
+                        if (!sy || !term) {
+                            // Show a Bootstrap modal prompting the user to set active School Year/Term
+                            try {
+                                const modalEl = document.getElementById('ensureAcademicContextModal');
+                                if (modalEl && typeof bootstrap !== 'undefined') {
+                                    const bs = new bootstrap.Modal(modalEl);
+                                    bs.show();
+                                } else {
+                                    try { alert('Please set an active School Year and active Term in System Settings → School Year/Term Setup before performing academic actions.') } catch (e) {}
+                                }
+                            } catch (e) {
+                                try { alert('Please set an active School Year and active Term in System Settings → School Year/Term Setup before performing academic actions.') } catch (e) {}
+                            }
+                            return false;
+                        }
+                return true;
+            } catch (e) { return true; }
+        };
+    </script>
+    <div class="modal fade" id="confirmCreateAdminModal" tabindex="-1" aria-labelledby="confirmCreateAdminLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmCreateAdminLabel">Confirm Create Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please review the information before creating:</p>
+                    <ul class="list-unstyled">
+                        <li><strong>Name:</strong> <span id="confirmAdminName"></span></li>
+                        <li><strong>Email:</strong> <span id="confirmAdminEmail"></span></li>
+                        <li><strong>Password/Invite:</strong> <span id="confirmAdminPwd"></span></li>
+                        <li><strong>Status:</strong> <span id="confirmAdminStatus"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="confirmCancelBtn" class="btn btn-secondary">Back</button>
+                    <button type="button" id="confirmCreateAdminBtn" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Teacher Modal removed (now injected by teacher-management view) -->
+
+    <!-- Confirm Create Teacher Modal -->
+    <div class="modal fade" id="confirmCreateTeacherModal" tabindex="-1" aria-labelledby="confirmCreateTeacherLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmCreateTeacherLabel">Confirm Create Teacher</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please review the information before creating:</p>
+                    <ul class="list-unstyled">
+                        <li><strong>First Name:</strong> <span id="confirmTeacherFirstName"></span></li>
+                        <li><strong>Last Name:</strong> <span id="confirmTeacherLastName"></span></li>
+                        <li><strong>Email:</strong> <span id="confirmTeacherEmail"></span></li>
+                        <li><strong>Password/Invite:</strong> <span id="confirmTeacherPwd"></span></li>
+                        <li><strong>Employee ID:</strong> <span id="confirmTeacherEmployeeId"></span></li>
+                        <li><strong>Department:</strong> <span id="confirmTeacherDepartment"></span></li>
+                        <li><strong>Status:</strong> <span id="confirmTeacherStatus"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="confirmTeacherBackBtn" class="btn btn-secondary">Back</button>
+                    <button type="button" id="confirmCreateTeacherBtn" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- (unsavedConfirmModal moved further down) -->
+    <!-- Create Student Modal removed (now injected by student-management view) -->
+
+    <!-- Confirm Create Student Modal -->
+    <div class="modal fade" id="confirmCreateStudentModal" tabindex="-1" aria-labelledby="confirmCreateStudentLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmCreateStudentLabel">Confirm Create Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please review the information before creating:</p>
+                    <ul class="list-unstyled">
+                        <li><strong>First Name:</strong> <span id="confirmStudentFirstName"></span></li>
+                        <li><strong>Last Name:</strong> <span id="confirmStudentLastName"></span></li>
+                        <li><strong>Email:</strong> <span id="confirmStudentEmail"></span></li>
+                        <li><strong>Student Number:</strong> <span id="confirmStudentNumber"></span></li>
+                        <li><strong>Class:</strong> <span id="confirmStudentClass"></span></li>
+                        <li><strong>Status:</strong> <span id="confirmStudentStatus"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="confirmStudentBackBtn" class="btn btn-secondary">Back</button>
+                    <button type="button" id="confirmCreateStudentBtn" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unsaved Changes Confirm Modal removed -->
+
+    <!-- Create Class Modal removed (now injected by classes view) -->
+
+    <!-- Confirm Create Class Modal (moved to top-level) -->
+    <div class="modal fade" id="confirmCreateClassModal" tabindex="-1" aria-labelledby="confirmCreateClassLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmCreateClassLabel">Confirm Create Class</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please review the information before creating:</p>
+                    <ul class="list-unstyled">
+                        <li><strong>School Year:</strong> <span id="confirmSchoolYear"></span></li>
+                        <li><strong>Grade Level:</strong> <span id="confirmGradeLevel"></span></li>
+                        <li><strong>Section:</strong> <span id="confirmSection"></span></li>
+                        <li><strong>Class Name:</strong> <span id="confirmClassName"></span></li>
+                        <li><strong>Class Advisor:</strong> <span id="confirmClassAdvisor"></span></li>
+                        <li><strong>Status:</strong> <span id="confirmClassStatus"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="confirmClassBackBtn" class="btn btn-secondary">Back</button>
+                    <button type="button" id="confirmCreateClassBtn" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subject modals are injected by the Subjects view to avoid duplication -->
+
+    <!-- Ensure Academic Context Modal -->
+    <div class="modal fade" id="ensureAcademicContextModal" tabindex="-1" aria-labelledby="ensureAcademicContextLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ensureAcademicContextLabel">Active School Year & Term Required</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Please set an active School Year and active Term in <strong>System Settings → School Year/Term Setup</strong> before performing academic actions.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dismiss</button>
+                    <button type="button" id="openYearTermSetupBtn" class="btn btn-primary">Open School Year / Term Setup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // View loader: switch between admin/teacher/student views
+        function loadView(name) {
+            // Ensure correct side-nav link is active when views are loaded programmatically
+            (function setActiveNav(viewName) {
+                document.querySelectorAll('.view-link').forEach(x => x.classList.remove('active'));
+                const link = document.querySelector('.view-link[data-view="' + viewName + '"]');
+                if (link) link.classList.add('active');
+            })(name);
+            switch (name) {
+                case "overview":
+                    if (typeof renderOverviewView === 'function') renderOverviewView();
+                    else console.warn('Overview view not available');
+                    break;
+                case "admin":
+                    if (typeof renderAdminView === 'function') renderAdminView();
+                    else console.warn('Admin view not available');
+                    break;
+                case "teacher":
+                    if (typeof renderTeacherView === 'function') renderTeacherView();
+                    else console.warn('Teacher view not available');
+                    break;
+                case "classes":
+                    if (typeof renderClassesView === 'function') renderClassesView();
+                    else console.warn('Classes view not available');
+                    break;
+                case "year-term":
+                    if (typeof renderSchoolYearTermView === 'function') renderSchoolYearTermView();
+                    else console.warn('School Year / Term view not available');
+                    break;
+                case "audit":
+                    if (typeof renderAuditLogsView === 'function') renderAuditLogsView();
+                    else console.warn('Audit Logs view not available');
+                    break;
+                case "roles":
+                    if (typeof renderRolesView === 'function') renderRolesView();
+                    else console.warn('Roles & Permissions view not available');
+                    break;
+                case "enroll-classes":
+                    if (typeof renderEnrollClassesView === 'function') renderEnrollClassesView();
+                    else console.warn('Enroll Classes view not available');
+                    break;
+                case "enroll-subjects":
+                    if (typeof renderEnrollSubjectsView === 'function') renderEnrollSubjectsView();
+                    else console.warn('Enroll Subjects view not available');
+                    break;
+                case "subjects":
+                    if (typeof renderSubjectsView === 'function') renderSubjectsView();
+                    else console.warn('Subjects view not available');
+                    break;
+                case "assignments":
+                    if (typeof renderAllAssignmentsView === 'function') renderAllAssignmentsView();
+                    else console.warn('Assignments view not available');
+                    break;
+                case "attendance":
+                    if (typeof renderAllAttendanceView === 'function') renderAllAttendanceView();
+                    else console.warn('Attendance view not available');
+                    break;
+                case "student":
+                    if (typeof renderStudentView === 'function') renderStudentView();
+                    else console.warn('Student view not available');
+                    break;
+                case "records":
+                    if (typeof renderRecordsView === 'function') renderRecordsView();
+                    else console.warn('Records view not available');
+                    break;
+                case "grades":
+                    if (typeof renderAllGradesView === 'function') renderAllGradesView();
+                    else console.warn('Grades view not available');
+                    break;
+                default:
+                    document.getElementById("mainContent").innerHTML =
+                        '<div class="p-3">Content for ' + name + " is not implemented yet.</div>";
+            }
+        }
+    </script>
+    <script>
+        // Centralized navigation with initial Overview activation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.view-link').forEach((a) => {
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const view = a.dataset.view;
+                    document.querySelectorAll('.view-link').forEach(x => x.classList.remove('active'));
+                    a.classList.add('active');
+                    loadView(view);
+                });
+            });
+
+            // Ensure Overview is active and loaded on first render
+            const overviewLink = document.querySelector('.view-link[data-view="overview"]');
+            if (overviewLink) {
+                document.querySelectorAll('.view-link').forEach(x => x.classList.remove('active'));
+                overviewLink.classList.add('active');
+            }
+            // Call loadView for overview (view code will warn if missing)
+            loadView('overview');
+        });
+    </script>
+    <!-- Sign Out Confirmation Modal -->
+    <div class="modal fade" id="confirmSignOutModal" tabindex="-1" aria-labelledby="confirmSignOutLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmSignOutLabel">Sign Out</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Are you sure you want to sign out?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelSignOutBtn">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmSignOutBtn">Sign Out</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show confirmation modal when Sign Out clicked. On confirm, sign out, clear persisted user, open login, then close dashboard.
+        document.addEventListener('DOMContentLoaded', () => {
+            const signOutBtn = document.getElementById('signOutBtn')
+            if (!signOutBtn) return
+            const modalEl = document.getElementById('confirmSignOutModal')
+            const confirmBtn = document.getElementById('confirmSignOutBtn')
+            let bsModal = null
+            if (modalEl && typeof bootstrap !== 'undefined') bsModal = new bootstrap.Modal(modalEl)
+
+            signOutBtn.addEventListener('click', (e) => {
+                e.preventDefault()
+                if (bsModal) bsModal.show(); else {
+                    if (!confirm('Sign out?')) return
+                    // fallback: trigger confirm handler
+                    confirmBtn && confirmBtn.click()
+                }
+            })
+
+            if (confirmBtn) confirmBtn.addEventListener('click', async (e) => {
+                try {
+                    if (window.firebase && window.firebase.auth) await window.firebase.auth().signOut()
+                } catch (err) { console.warn('dashboard signOut failed', err) }
+                try { if (window.api && window.api.clearLastUser) await window.api.clearLastUser() } catch (e) {}
+                try { if (window.api && window.api.openLogin) await window.api.openLogin() } catch (e) { console.warn('openLogin failed', e) }
+                try { if (bsModal) bsModal.hide() } catch (e) {}
+                try { if (window.api && window.api.close) await window.api.close() } catch (e) {}
+            })
+        })
+    </script>
+    <script src="./js/overview/overview.js"></script>
+    <script src="./js/account-management/admin-management.js"></script>
+    <script src="./js/account-management/teacher-management.js"></script>
+    <script src="./js/account-management/student-management.js"></script>
+    <script src="./js/student-management/enroll-students-in-classes.js"></script>
+    <script src="./js/student-management/enroll-students-in-subjects.js"></script>
+    <script src="./js/student-management/records.js"></script>
+    <script src="./js/academic-structure/classes.js"></script>
+    <script src="./js/academic-structure/subjects.js"></script>
+    <script src="./js/system-data/all-grades.js"></script>
+    <script src="./js/system-data/all-attendance.js"></script>
+    <script src="./js/system-data/all-assignments.js"></script>
+    <script src="./js/system-settings/school-year-term-setup.js"></script>
+    <script src="./js/system-settings/roles&permissions.js"></script>
+    <script src="./js/system-settings/audit-logs.js"></script>
+    <script>
+        // Ensure unsavedConfirmModal appears above other modals/backdrops
+        document.addEventListener('shown.bs.modal', (ev) => {
+            const target = ev.target;
+            if (!target || target.id !== 'unsavedConfirmModal') return;
+            try {
+                // bring modal to very top
+                target.style.zIndex = 20000;
+                // adjust the last backdrop to sit behind it
+                const backs = document.querySelectorAll('.modal-backdrop');
+                if (backs && backs.length) {
+                    const last = backs[backs.length - 1];
+                    last.style.zIndex = 19999;
+                }
+            } catch (e) {
+                console.warn('Could not raise unsaved modal z-index', e);
+            }
+        });
+        document.addEventListener('hidden.bs.modal', (ev) => {
+            const target = ev.target;
+            if (!target || target.id !== 'unsavedConfirmModal') return;
+            // reset style
+            target.style.zIndex = '';
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/inactivity-logout.js"></script>
+</body>
+
+</html>

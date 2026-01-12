@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.DS_Store
+npm-debug.log
+
+# Local env file (do not commit)
+.env
+
+# Ignore committed Firebase admin service account JSON and signing keys
+src/firebase-admin/serviceAccount.json
+
+# Common code-signing key formats
+*.pfx
+*.p12
+*.pem
+*.key

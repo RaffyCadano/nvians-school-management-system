@@ -1,0 +1,144 @@
+/* Login window styles extracted from index.html */
+/* Fustat font faces (local files) */
+@font-face {
+  font-family: 'Fustat';
+  src: url('../assets/fonts/Fustat/static/Fustat-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fustat';
+  src: url('../assets/fonts/Fustat/static/Fustat-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fustat';
+  src: url('../assets/fonts/Fustat/static/Fustat-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fustat';
+  src: url('../assets/fonts/Fustat/static/Fustat-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fustat';
+  src: url('../assets/fonts/Fustat/static/Fustat-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fustat';
+  src: url('../assets/fonts/Fustat/static/Fustat-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fustat';
+  src: url('../assets/fonts/Fustat/static/Fustat-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: 'Fustat', system-ui, -apple-system, 'Segoe UI', Roboto, "Helvetica Neue", Arial;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f9fc;
+  padding-top: 36px;
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Keep form area clean — no outer border */
+.card-body {
+  background: transparent;
+  padding: 1.5rem;
+}
+
+/* Form elements — clean, slightly rounded inputs without heavy borders */
+.form-control {
+  border-radius: 10px;
+  padding: .75rem 1rem;
+  border: 1px solid rgba(16,24,40,0.06);
+  box-shadow: none;
+}
+.form-control:focus {
+  box-shadow: 0 0 0 0.15rem rgba(99,102,241,0.08);
+  border-color: rgba(99,102,241,0.6);
+}
+
+/* Input group buttons styling to match inputs */
+.input-group .btn {
+  border-radius: 0 10px 10px 0;
+  border: 1px solid rgba(16,24,40,0.06);
+  border-left: none;
+  background: transparent;
+}
+.input-group-text {
+  background: transparent;
+  border: none; 
+  background: transparent; 
+  padding: 6px 10px; 
+  cursor: pointer; 
+}
+
+/* Primary button — modern flat look */
+.btn-primary {
+  border-radius: 10px;
+  padding: .6rem;
+  border: none;
+  background: linear-gradient(90deg,#4b6cb7,#182848);
+  box-shadow: none;
+}
+
+/* Eye icon color and hover state */
+.input-group .btn i {
+  color: rgba(55,65,81,0.7);
+  font-size: 1.05rem;
+}
+.input-group .btn:hover i {
+  color: #182848;
+}
+.input-group .btn:active {
+  background: rgba(0,0,0,0.06);
+}
+.text-muted.small { margin-bottom: 1rem }
+
+/* Custom app bar */
+.app-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  -webkit-app-region: drag;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.app-bar .btn { -webkit-app-region: no-drag }
+.app-bar .btn { border: none; background: transparent; padding: 6px 10px }
+.app-bar .btn:hover { background: rgba(0,0,0,0.04); border-radius:4px }
+
+/* Brand icon above heading */
+.brand-icon { font-size: 36px; color: #182848; display: inline-block }

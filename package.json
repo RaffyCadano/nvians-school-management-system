@@ -1,0 +1,73 @@
+{
+  "name": "admin-software-electron",
+  "version": "0.1.0",
+  "description": "Electron scaffold for admin-software",
+  "main": "src/main.js",
+  "authors": [
+    {
+      "name": "Raffy Cadano",
+      "email": "",
+      "url": "https://vandamprojects.dev"
+    },
+    {
+      "name": "Nvians",
+      "email": "",
+      "url": "https://nvians.com"
+    }
+  ],
+  "scripts": {
+    "start": "electron .",
+    "create-backup-admin": "node ./scripts/create-backup-admin.js",
+    "prepack": "node ./scripts/write-service-account.js",
+    "predist": "node ./scripts/write-service-account.js",
+    "pack": "npm run prepack && electron-builder --dir",
+    "dist": "npm run predist && electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^26.2.0",
+    "electron-builder": "^24.6.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "firebase-admin": "^13.6.0"
+    ,"electron-updater": "^5.4.1"
+  }
+  ,
+  "build": {
+    "appId": "com.nvians.admin-software",
+    "productName": "NVIANS SMS",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "src/**",
+      "node_modules/**",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "license": "build/license.txt"
+    }
+    ,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YOUR_GITHUB_OWNER",
+        "repo": "YOUR_REPO_NAME"
+      }
+    ]
+  }
+}

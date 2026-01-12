@@ -1,0 +1,18 @@
+{
+  "admin": {
+    "DkQykRclPobkyKywJFNKC83O4Nl2": {
+      "uid": "DkQykRclPobkyKywJFNKC83O4Nl2",
+      "name": "School Admin",
+      "email": "raffyjade_14@yahoo.com",
+      "roles": "Admin",
+      "status": "Active",
+      "createdAt": "2026-01-09T12:00:00.000Z",
+      "lastLoginAt": null,
+      "notes": "Created via console script",
+      "meta": {
+        "createdBy": "system",
+        "source": "auto-console"
+      }
+    }
+  }
+}
